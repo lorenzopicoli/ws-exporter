@@ -1,11 +1,11 @@
 {
   "extensionDescription": {
-    "description": "Extension description",
-    "message": "Chrome extension boilerplate developed with Vite, React and Typescript"
+    "description": "Extension Description",
+    "message": "A browser extension that allows you to export your Wealthsimple transactions"
   },
   "extensionName": {
-    "description": "Extension name",
-    "message": "Chrome extension boilerplate"
+    "description": "Extension Name",
+    "message": "Wealthsimple Exporter"
   },
   "toggleTheme": {
     "message": "Toggle theme"
