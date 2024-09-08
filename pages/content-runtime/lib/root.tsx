@@ -1,12 +1,19 @@
 import { isValid, parse } from 'date-fns';
-function findElementWithUUIDHeaderXPath() {
-  // Select all elements with role='button'
-  const elements = document.querySelectorAll('[role="button"]');
 
-  // Regular expression to match any text followed by '-header'
+type ParsedTransactions = Array<Record<string, number | string | undefined | null> | undefined>;
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Tries to match with each transaction's button header element which can
+ * be clicked to reveal the transaction details.
+ */
+async function expandTransactions() {
+  const elements = document.querySelectorAll('[role="button"]');
   const headerRegex = /-header$/;
 
-  // Iterate over the elements and check the ID against the regex
   elements.forEach(element => {
     if (headerRegex.test(element.id)) {
       if (element instanceof HTMLElement) {
@@ -15,24 +22,34 @@ function findElementWithUUIDHeaderXPath() {
     }
   });
 
-  return null; // If no matching element is found
+  // There are api calls that are made to fetch the transaction details
+  // which may take some time to complete. So, we wait for a couple seconds
+  await delay(2000);
 }
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-const parseRow = (name: string, value?: string) => {
+
+/**
+ * Examples:
+ * 1. Account: Cash
+ * 2. Date: July 10, 202411:35 pm -> The date and time are in different lines, but getting textContent will return them in a single line
+ * 3. Exchange Rate: 1.4795
+ * 4. Original Amount: − 20.00 EUR
+ * 5. Spend Rewards: + $0.30 CAD
+ * 6. Status: Completed
+ * 7. Total: − $29.59 CAD
+ */
+function parseRow(name: string, value?: string) {
+  console.log('Called with', name, value);
   const normalizedName = name.toLowerCase();
   const parseCurrencyValue = (value: string) => {
-    const [sign, amount, currency] = value?.split(' ') ?? [];
+    const split = value?.split(' ') ?? [];
+    if (split.length < 3) {
+      const [amount, currency] = split;
+      const sign = amount.indexOf('−') > -1 ? '−' : '+';
+      return { amount: parseFloat(amount.replace('$', '')) * (sign === '−' ? -1 : 1), currency };
+    }
+    const [sign, amount, currency] = split;
     return { amount: parseFloat(amount.replace('$', '')) * (sign === '−' ? -1 : 1), currency };
   };
-  //   account: 'Cash';
-  //   date: 'July 10, 202411:35 pm';
-  //   exchangeRate: '1.4795';
-  //   originalAmount: '− 20.00 EUR';
-  //   spendRewards: '+ $0.30 CAD';
-  //   status: 'Completed';
-  //   total: '− $29.59 CAD';
   if (normalizedName === 'account') {
     return { account: value };
   }
@@ -67,7 +84,7 @@ const parseRow = (name: string, value?: string) => {
     }
     return { exchangeRate: parseFloat(value) };
   }
-  if (normalizedName === 'total') {
+  if (normalizedName === 'total' || normalizedName === 'amount') {
     if (!value) {
       return {};
     }
@@ -83,36 +100,77 @@ const parseRow = (name: string, value?: string) => {
     return { spendRewards: parsed.amount, spendRewardsCurrency: parsed.currency };
   }
   return {};
-};
+}
+
+/**
+ * Extracts the transaction description from the transaction details container element
+ * @param element The transaction details container element
+ */
+function getTransactionDescription(element: Element) {
+  // From the transaction details we find again the header button which contains the name/description
+  const transactionHeaderExp = '../child::*[1]/child::*[1]/child::*[1]/child::*[1]/child::*[2]/child::*[1]';
+  const transactionHeader = document.evaluate(
+    transactionHeaderExp,
+    element,
+    null,
+    XPathResult.FIRST_ORDERED_NODE_TYPE,
+    null,
+  ).singleNodeValue;
+  const description = transactionHeader?.textContent;
+
+  return description;
+}
+
+function processTransactionDetails(element: Element): ParsedTransactions[number] {
+  const rows = element.children[0]?.children;
+  if (!rows || rows.length === 0) {
+    return;
+  }
+
+  let rowData: ParsedTransactions[number] = {};
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if (row.children.length !== 2 || !row.children[0].textContent) {
+      continue;
+    }
+    rowData = { ...rowData, ...parseRow(row.children[0].textContent, row.children[1].textContent ?? undefined) };
+  }
+
+  if (Object.keys(rowData).length === 0) {
+    return;
+  }
+  const description = getTransactionDescription(element);
+  if (description) {
+    rowData = { ...rowData, description };
+  }
+  return rowData;
+}
+
+function parsedTransactionsToCsv(parsed: ParsedTransactions) {
+  const items = parsed.filter(Boolean);
+  const firstItem = items[0];
+  if (!firstItem) {
+    return '';
+  }
+  const replacer = (_key: string, value: unknown) => (value === null ? '' : value); // specify how you want to handle null values here
+  const header = Object.keys(firstItem);
+  const csv = [
+    header.join(','), // header row first
+    ...items.map(row => header.map(fieldName => JSON.stringify(row?.[fieldName], replacer)).join(',')),
+  ].join('\r\n');
+
+  return csv;
+}
 
 export async function mount() {
-  findElementWithUUIDHeaderXPath();
+  await expandTransactions();
 
-  await delay(3000);
+  // Find the transaction details are which seems to have a role of region
   const role = 'region';
   const roleElement = document.querySelectorAll(`[role="${role}"]`);
-  const result: any[] = [];
-  roleElement.forEach(element => {
-    const xpathExpression = '../child::*[1]/child::*[1]/child::*[1]/child::*[1]/child::*[2]/child::*[1]';
-    const r = document.evaluate(xpathExpression, element, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-    const descriptionEl = r.singleNodeValue;
 
-    const child = element.children[0];
-    const rows = child.children;
-    let rowData: Record<string, number | string | undefined | null> = { description: descriptionEl?.textContent };
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.children.length !== 2) {
-        continue;
-      }
-      //   console.log('-----------------------------');
-      if (!row.children[0].textContent) {
-        continue;
-      }
-      rowData = { ...rowData, ...parseRow(row.children[0].textContent, row.children[1].textContent ?? undefined) };
-      //   console.log(`${row.children[0].textContent}: ${row.children[1].textContent}`);
-    }
-    result.push(rowData);
-  });
-  console.log(result);
+  const result: ParsedTransactions = Array.from(roleElement).map(processTransactionDetails);
+  const csv = parsedTransactionsToCsv(result);
+  console.log(csv);
 }
