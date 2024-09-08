@@ -1,3 +1,4 @@
+import 'webextension-polyfill';
 import { expand } from '@lib/expand';
 import { exportTransactions } from '@lib/export';
 

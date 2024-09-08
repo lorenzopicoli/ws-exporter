@@ -18,6 +18,6 @@ export default withPageConfig({
       name: 'ContentRuntimeScript',
       fileName: 'index',
     },
-    outDir: resolve(rootDir, '..', '..', 'dist', 'content-runtime'),
+    outDir: resolve(rootDir, '..', '..', 'dist', 'content'),
   },
 });

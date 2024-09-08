@@ -1,0 +1,30 @@
+{
+  "extensionDescription": {
+    "description": "Extension Description",
+    "message": "A browser extension that allows you to export your Wealthsimple transactions"
+  },
+  "extensionName": {
+    "description": "Extension Name",
+    "message": "Wealthsimple Exporter"
+  },
+  "toggleTheme": {
+    "message": "Toggle theme"
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "Hello, My name is $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "John Doe"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "Hello $1"
+  }
+}

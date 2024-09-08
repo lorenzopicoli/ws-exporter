@@ -232,7 +232,11 @@ importers:
         specifier: ^4.16.2
         version: 4.16.2
 
-  pages/content-runtime:
+  pages/content:
+    dependencies:
+      webextension-polyfill:
+        specifier: ^0.12.0
+        version: 0.12.0
     devDependencies:
       '@extension/hmr':
         specifier: workspace:*
@@ -246,9 +250,9 @@ importers:
 
   pages/popup:
     dependencies:
-      '@extension/content-runtime-script':
+      '@extension/content':
         specifier: workspace:*
-        version: link:../content-runtime
+        version: link:../content
       '@types/node':
         specifier: ^20.14.10
         version: 20.14.10

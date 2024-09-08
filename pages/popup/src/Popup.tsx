@@ -1,31 +1,10 @@
 import '@src/Popup.css';
-import { useEffect, type ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef } from 'react';
 import { withSuspense } from './withSuspense';
 import { withErrorBoundary } from './withErrorBoundary';
 
 const Popup = () => {
   const logo = 'popup/logo_vertical.svg';
-
-  const injectContentScript = async () => {
-    const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
-    console.log('injecting');
-    await chrome.scripting
-      .executeScript({
-        target: { tabId: tab.id! },
-        files: ['/content-runtime/index.iife.js'],
-      })
-      .catch(err => {
-        if (err.message.includes('Cannot access a chrome:// URL')) {
-          alert('You cannot inject script here!');
-        }
-      });
-  };
-
-  useEffect(() => {
-    injectContentScript();
-  }, []);
-
-  //   injectContentScript();
 
   return (
     <div className={`App bg-slate-50`}>
@@ -36,15 +15,17 @@ const Popup = () => {
         </p>
         <Button
           onClick={async () => {
-            await injectContentScript();
-            chrome.runtime.sendMessage({ type: 'export' });
+            // await injectContentScript();
+            const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+            await chrome.tabs.sendMessage(tab.id!, { type: 'export' });
           }}>
           Export transactions
         </Button>
         <Button
           onClick={async () => {
-            await injectContentScript();
-            chrome.runtime.sendMessage({ type: 'expand' });
+            // await injectContentScript();
+            const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+            await chrome.tabs.sendMessage(tab.id!, { type: 'expand' });
           }}>
           Expand transactions
         </Button>
