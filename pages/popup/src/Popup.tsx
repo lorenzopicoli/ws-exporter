@@ -1,13 +1,14 @@
 import '@src/Popup.css';
-import { withErrorBoundary, withSuspense } from '@extension/shared';
-import type { ComponentPropsWithoutRef } from 'react';
+import { useEffect, type ComponentPropsWithoutRef } from 'react';
+import { withSuspense } from './withSuspense';
+import { withErrorBoundary } from './withErrorBoundary';
 
 const Popup = () => {
   const logo = 'popup/logo_vertical.svg';
 
   const injectContentScript = async () => {
     const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
-
+    console.log('injecting');
     await chrome.scripting
       .executeScript({
         target: { tabId: tab.id! },
@@ -20,6 +21,10 @@ const Popup = () => {
       });
   };
 
+  useEffect(() => {
+    injectContentScript();
+  }, []);
+
   //   injectContentScript();
 
   return (
@@ -29,8 +34,20 @@ const Popup = () => {
         <p>
           Edit <code>pages/popup/src/Popup.tsx</code>
         </p>
-        <Button>Export</Button>
-        <Button onClick={injectContentScript}>Run</Button>
+        <Button
+          onClick={async () => {
+            await injectContentScript();
+            chrome.runtime.sendMessage({ type: 'export' });
+          }}>
+          Export transactions
+        </Button>
+        <Button
+          onClick={async () => {
+            await injectContentScript();
+            chrome.runtime.sendMessage({ type: 'expand' });
+          }}>
+          Expand transactions
+        </Button>
       </header>
     </div>
   );
