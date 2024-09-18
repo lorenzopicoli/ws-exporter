@@ -138,6 +138,23 @@ function parsedTransactionsToCsv(parsed: ParsedTransactions) {
   return csv;
 }
 
+/**
+ * Exports the transactions to a CSV file
+ */
+async function downloadCsv(filename: string, csv: string) {
+  const pom = document.createElement('a');
+  pom.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+  pom.setAttribute('download', filename);
+
+  if (document.createEvent) {
+    const event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    pom.dispatchEvent(event);
+  } else {
+    pom.click();
+  }
+}
+
 export async function exportTransactions() {
   // Find the transaction details are which seems to have a role of region
   const role = 'region';
@@ -145,5 +162,5 @@ export async function exportTransactions() {
 
   const result: ParsedTransactions = Array.from(roleElement).map(processTransactionDetails);
   const csv = parsedTransactionsToCsv(result);
-  console.log(csv);
+  await downloadCsv(`ws-exporter-${new Date().toISOString()}.csv`, csv);
 }
