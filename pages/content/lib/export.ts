@@ -13,17 +13,18 @@ type ParsedTransactions = Array<Record<string, number | string | undefined | nul
  * 7. Total: − $29.59 CAD
  */
 function parseRow(name: string, value?: string) {
-  console.log('Called with', name, value);
   const normalizedName = name.toLowerCase();
+  // Assumes 3,000.00 -> 3000.00. Will break for some locales
+  const normalizeAmount = (amount: string) => amount.replace('$', '').replace(',', '');
   const parseCurrencyValue = (value: string) => {
     const split = value?.split(' ') ?? [];
     if (split.length < 3) {
       const [amount, currency] = split;
       const sign = amount.indexOf('−') > -1 ? '−' : '+';
-      return { amount: parseFloat(amount.replace('$', '')) * (sign === '−' ? -1 : 1), currency };
+      return { amount: parseFloat(normalizeAmount(amount)) * (sign === '−' ? -1 : 1), currency };
     }
     const [sign, amount, currency] = split;
-    return { amount: parseFloat(amount.replace('$', '')) * (sign === '−' ? -1 : 1), currency };
+    return { amount: parseFloat(normalizeAmount(amount)) * (sign === '−' ? -1 : 1), currency };
   };
   if (normalizedName === 'account') {
     return { account: value };
