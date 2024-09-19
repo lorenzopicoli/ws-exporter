@@ -29,6 +29,9 @@ function parseRow(name: string, value?: string) {
   if (normalizedName === 'account') {
     return { account: value };
   }
+  if (normalizedName === 'to') {
+    return { account: value };
+  }
   if (normalizedName === 'status') {
     return { status: value };
   }
@@ -125,15 +128,21 @@ function processTransactionDetails(element: Element): ParsedTransactions[number]
 
 function parsedTransactionsToCsv(parsed: ParsedTransactions) {
   const items = parsed.filter(Boolean);
-  const firstItem = items[0];
-  if (!firstItem) {
-    return '';
-  }
-  const replacer = (_key: string, value: unknown) => (value === null ? '' : value); // specify how you want to handle null values here
-  const header = Object.keys(firstItem);
+  const replacer = (_key: string, value: unknown) => (value === null || value === undefined ? '' : value); // specify how you want to handle null values here
+  const headers = Object.keys(
+    items.reduce(
+      (acc, item) => {
+        Object.keys(item ?? {}).forEach(key => {
+          acc[key] = true;
+        });
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    ),
+  );
   const csv = [
-    header.join(','), // header row first
-    ...items.map(row => header.map(fieldName => JSON.stringify(row?.[fieldName], replacer)).join(',')),
+    headers.join(','), // header row first
+    ...items.map(row => headers.map(fieldName => JSON.stringify(row?.[fieldName], replacer)).join(',')),
   ].join('\r\n');
 
   return csv;
