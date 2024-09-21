@@ -127,7 +127,13 @@ function processTransactionDetails(element: Element): ParsedTransactions[number]
 }
 
 function parsedTransactionsToCsv(parsed: ParsedTransactions) {
-  const items = parsed.filter(Boolean);
+  const items = parsed.filter(Boolean).sort((a, b) => {
+    if (!a?.date || !b?.date) {
+      return 0;
+    }
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
+  });
+
   const replacer = (_key: string, value: unknown) => (value === null || value === undefined ? '' : value); // specify how you want to handle null values here
   const headers = Object.keys(
     items.reduce(
@@ -140,6 +146,7 @@ function parsedTransactionsToCsv(parsed: ParsedTransactions) {
       {} as Record<string, boolean>,
     ),
   );
+
   const csv = [
     headers.join(','), // header row first
     ...items.map(row => headers.map(fieldName => JSON.stringify(row?.[fieldName], replacer)).join(',')),
