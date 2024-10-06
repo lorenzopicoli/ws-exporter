@@ -30,7 +30,10 @@ function parseRow(name: string, value?: string) {
     return { account: value };
   }
   if (normalizedName === 'to') {
-    return { account: value };
+    return { to: value };
+  }
+  if (normalizedName === 'from') {
+    return { from: value };
   }
   if (normalizedName === 'status') {
     return { status: value };
@@ -101,7 +104,24 @@ function getTransactionDescription(element: Element) {
 }
 
 function processTransactionDetails(element: Element): ParsedTransactions[number] {
-  const rows = element.children[0]?.children;
+  let rows = [];
+  for (let i = 0; i < element.children[0]?.children?.length ?? 0; i++) {
+    // Will have 2 children for name/value for most cases. For interac transfers, there will be another level which is handled
+    // by the else block
+    const row = element.children[0].children[i];
+    if (row.children.length === 2 && row.children[0].textContent) {
+      rows.push(row);
+    } else {
+      const result = [];
+      for (let i = 0; i < row.children.length; i++) {
+        if (row.children[i].children.length === 2 && row.children[i].children[0].textContent) {
+          result.push(row.children[i]);
+        }
+      }
+      rows.push(result);
+    }
+  }
+  rows = rows.flat();
   if (!rows || rows.length === 0) {
     return;
   }
@@ -110,6 +130,7 @@ function processTransactionDetails(element: Element): ParsedTransactions[number]
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
+
     if (row.children.length !== 2 || !row.children[0].textContent) {
       continue;
     }
@@ -118,6 +139,10 @@ function processTransactionDetails(element: Element): ParsedTransactions[number]
 
   if (Object.keys(rowData).length === 0) {
     return;
+  }
+
+  if (!rowData.account && (rowData.to || rowData.from)) {
+    rowData = { ...rowData, account: ((rowData.total as number) ?? 0) < 0 ? rowData.from : rowData.to };
   }
   const description = getTransactionDescription(element);
   if (description) {
