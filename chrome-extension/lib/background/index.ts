@@ -1,7 +1,7 @@
 import 'webextension-polyfill';
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-  const iconVariant = e.matches ? '-white' : '';
+  const iconVariant = e.matches ? '-white' : '-dark';
 
   chrome.browserAction.setIcon({
     path: {

@@ -1,30 +1,25 @@
-.App {
+.background {
+  background: #233a29;
+}
+
+.text {
+  color: #f6f6f6;
+}
+
+.button {
+  background-color: #3c7c5a;
+  color: white;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  height: 40px;
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  height: 100%;
-  padding: 1rem;
 }
 
-.App-logo {
-  height: 50vmin;
-  margin-bottom: 1rem;
+.headerText {
+  opacity: 0.6;
 }
 
-.App-header {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  font-size: 0.75rem;
-}
-
-code {
-  background: rgba(148, 163, 184, 0.5);
-  border-radius: 0.25rem;
-  padding: 0.2rem 0.5rem;
+.button:hover {
+  opacity: 0.8;
 }
