@@ -20,7 +20,7 @@ const manifest = deepmerge(
     name: '__MSG_extensionName__',
     version: packageJson.version,
     description: '__MSG_extensionDescription__',
-    host_permissions: ['<all_urls>'],
+    host_permissions: ['*://my.wealthsimple.com/*'],
     permissions: ['scripting'],
     options_page: 'options/index.html',
     background: {
@@ -33,14 +33,14 @@ const manifest = deepmerge(
     },
     content_scripts: [
       {
-        matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+        matches: ['http://my.wealthsimple.com/*', 'https://my.wealthsimple.com/*'],
         js: ['content/index.iife.js'],
       },
     ],
     web_accessible_resources: [
       {
-        resources: ['*.js', '*.css', '*.svg', 'icon-128.png', 'icon-34.png'],
-        matches: ['*://*/*'],
+        resources: ['*.js', '*.css', '*.svg', '*.png'],
+        matches: ['*://my.wealthsimple.com/*'],
       },
     ],
   },
