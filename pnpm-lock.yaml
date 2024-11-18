@@ -125,8 +125,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/vite-config
       '@laynezh/vite-plugin-lib-assets':
-        specifier: ^0.5.23
-        version: 0.5.23(vite@5.4.1(@types/node@20.14.10)(sass@1.77.8)(terser@5.31.1))
+        specifier: ^0.5.25
+        version: 0.5.25(vite@5.4.1(@types/node@20.14.10)(sass@1.77.8)(terser@5.31.1))
       '@types/ws':
         specifier: ^8.5.12
         version: 8.5.12
@@ -621,8 +621,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@laynezh/vite-plugin-lib-assets@0.5.23':
-    resolution: {integrity: sha512-17df7hIpAM/wO+2z6cI7OIBuoJCHz1pRtY5A6g+R72KVKhjp8KrqCObDapuWEGY+RliSTBjvwi6rfQfFj/1JKg==}
+  '@laynezh/vite-plugin-lib-assets@0.5.25':
+    resolution: {integrity: sha512-fzQiZPxLTVNoUgT4BC7LgHr9jWJtNf0yb8UDc2srDwMZ6I2VAEN6AK5K0hk4pyn0eQo8jFvpY3T1DfCAHSLqHw==}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0 || ^5.0.0
 
@@ -1482,6 +1482,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   esm@3.2.25:
@@ -3027,7 +3028,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@laynezh/vite-plugin-lib-assets@0.5.23(vite@5.4.1(@types/node@20.14.10)(sass@1.77.8)(terser@5.31.1))':
+  '@laynezh/vite-plugin-lib-assets@0.5.25(vite@5.4.1(@types/node@20.14.10)(sass@1.77.8)(terser@5.31.1))':
     dependencies:
       escape-string-regexp: 4.0.0
       loader-utils: 3.3.1
