@@ -27,7 +27,7 @@ function convertToFirefoxCompatibleManifest(manifest: Manifest) {
   };
   manifestCopy.browser_specific_settings = {
     gecko: {
-      id: 'example@example.com',
+      id: 'lorenzopicoli@gmail.com',
       strict_min_version: '109.0',
     },
   };
