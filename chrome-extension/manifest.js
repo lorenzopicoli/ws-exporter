@@ -2,6 +2,8 @@ import fs from 'node:fs';
 
 const packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf8'));
 
+const isFirefox = true;
+
 /**
  * After changing, please reload the extension at `chrome://extensions`
  * @type {chrome.runtime.ManifestV3}
@@ -17,15 +19,14 @@ const manifest = {
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
   host_permissions: ['*://my.wealthsimple.com/*'],
-  permissions: ['scripting', 'activeTab', '*://my.wealthsimple.com/*'],
-  options_page: 'options/index.html',
+  permissions: !isFirefox ? ['activeTab', '*://my.wealthsimple.com/*'] : ['activeTab'],
   background: {
     service_worker: 'background.iife.js',
     type: 'module',
 
     //action: {
-    default_popup: 'popup/index.html',
-    default_icon: 'icon-white-128.png',
+    default_popup: !isFirefox ? 'popup/index.html' : undefined,
+    default_icon: !isFirefox ? 'icon-white-128.png' : undefined,
   },
   content_scripts: [
     {
@@ -39,6 +40,14 @@ const manifest = {
       matches: ['*://my.wealthsimple.com/*'],
     },
   ],
+  ...(isFirefox
+    ? {
+        action: {
+          default_popup: 'popup/index.html',
+          default_icon: 'icon-white-128.png',
+        },
+      }
+    : {}),
 };
 
 export default manifest;
