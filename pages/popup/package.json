@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@extension/content": "workspace:*",
-    "@types/node": "^20.14.10"
+    "@types/node": "^22.9.3"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",
